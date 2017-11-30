@@ -22,7 +22,14 @@ spring:
     testWhileIdle: true
     timeBetweenEvictionRunsMillis: 3000
     validationQuery: SELECT 'x'
-
+druid:
+  filters: stat,wall,slf4j
+  loginUsername: admin
+  loginPassword: admin@2017
+  allow: 127.0.0.1
+  sessionStatEnable: true
+  sessionStatMaxCount: 2000
+  profileEnable: true
 #mybatis
 mybatis-plus:
   mapper-locations: classpath:/mapper/*Mapper.xml

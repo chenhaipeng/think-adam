@@ -1,28 +1,27 @@
-#app
-server:
-    port: 8080
-
-#spring
+#默认的profile为prod，其他环境通过指定启动参数使用不同的profile，比如：
+#测试环境：java -jar my-spring-boot.jar --spring.profiles.active=test
+#生产环境：java -jar my-spring-boot.jar --spring.profiles.active=prod
+# 连接池配置
 spring:
-  devtools:
-    restart:
-      enabled: false
-
-  # H2 DATABASE CONFIG
+  profiles:
+    active: @activatedProperties@
+  aop:
+    auto: true
   datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
-    schema: classpath:/db/schema-h2.sql
-    data: classpath:/db/data-h2.sql
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password: sa
-    platform: h2
-    initialize: true
-    continue-on-error: true
-  h2:
-    console:
-      enabled: true
-      path: /console
+    connectionProperties: druid.stat.mergeSql=true;logSlowSql=true;druid.stat.slowSqlMillis=5000
+    filters: stat,slf4j
+    initialSize: 5
+    maxActive: 100
+    maxPoolPreparedStatementPerConnectionSize: 20
+    maxWait: 60000
+    minEvictableIdleTimeMillis: 300000
+    minIdle: 5
+    poolPreparedStatements: true
+    testOnBorrow: false
+    testOnReturn: false
+    testWhileIdle: true
+    timeBetweenEvictionRunsMillis: 3000
+    validationQuery: SELECT 'x'
 
 #mybatis
 mybatis-plus:
@@ -53,6 +52,3 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
     cache-enabled: false
-#logging
-logging:
-  level: warn

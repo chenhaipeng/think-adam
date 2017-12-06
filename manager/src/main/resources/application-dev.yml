@@ -1,5 +1,7 @@
 logging:
   config: classpath:logback-dev.xml
+swagger:
+  enabled: true
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource

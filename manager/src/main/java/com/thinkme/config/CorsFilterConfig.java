@@ -18,7 +18,7 @@ import java.util.Arrays;
  * @date 2017/11/30 下午11:48
  */
 @Configuration
-public class WebFilterConfig {
+public class CorsFilterConfig {
 
 	@Bean(name = "corsFilterRegistrationBean")
 	public FilterRegistrationBean filterRegistrationBean() {

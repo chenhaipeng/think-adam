@@ -1,10 +1,14 @@
 package com.thinkme.config;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.sql.DataSource;
 import java.util.Properties;
 
 /**
@@ -32,6 +36,13 @@ public class SpringBeanConfig {
 		Config config=new Config(properties);
 		defaultKaptcha.setConfig(config);
 		return defaultKaptcha;
+	}
+
+	@Bean(name = "dataSource")
+	@Qualifier("dataSource")
+	@ConfigurationProperties(prefix="spring.datasource")//加载所有以spring.datasource开头的参数来初始化连接池
+	public DataSource dataSource() {
+		return new DruidDataSource();
 	}
 
 }

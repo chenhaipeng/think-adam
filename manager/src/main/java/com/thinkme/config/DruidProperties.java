@@ -7,21 +7,21 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = DruidProperties.DRUID_PREFIX)
 public class DruidProperties {
 
-    public  static final String DRUID_PREFIX = "druid" ;
+    public static final String DRUID_PREFIX = "druid";
 
-    private String filters ;
+    private String filters;
 
-    private String loginUsername ;
+    private String loginUsername;
 
-    private String loginPassword ;
+    private String loginPassword;
 
     private String allow;
 
-    private String sessionStatEnable ;
+    private String sessionStatEnable;
 
-    private String sessionStatMaxCount ;
+    private String sessionStatMaxCount;
 
-    private String profileEnable ;
+    private String profileEnable;
 
     public String getFilters() {
         return filters;

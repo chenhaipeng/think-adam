@@ -11,14 +11,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class BeautifulPicturesService {
 
-	public BeautifulPictures updateById(BeautifulPictures beautifulPictures) {
-		System.out.println("update "+beautifulPictures);
+    public BeautifulPictures updateById(BeautifulPictures beautifulPictures) {
+        System.out.println("update " + beautifulPictures);
 
-		return beautifulPictures;
+        return beautifulPictures;
 
-	}
+    }
 
-	public BeautifulPictures selectById(String id) {
-		return new BeautifulPictures(id,"xxx");
-	}
+    public BeautifulPictures selectById(String id) {
+        return new BeautifulPictures(id, "xxx");
+    }
 }

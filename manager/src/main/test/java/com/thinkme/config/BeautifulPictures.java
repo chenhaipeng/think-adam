@@ -15,8 +15,8 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BeautifulPictures implements Serializable{
-	private String title;
-	private String id;
+public class BeautifulPictures implements Serializable {
+    private String title;
+    private String id;
 
 }

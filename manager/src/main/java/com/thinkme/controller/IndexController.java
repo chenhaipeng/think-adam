@@ -13,11 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class IndexController {
-	private static final Logger logger = LoggerFactory.getLogger(IndexController.class);
-	@RequestMapping(value = "/")
-	public String index(){
+    private static final Logger logger = LoggerFactory.getLogger(IndexController.class);
+
+    @RequestMapping(value = "/")
+    public String index() {
 //		System.out.println("hello world");
-		logger.info("hello chen");
-		return "hello thinkme";
-	}
+        logger.info("hello chen");
+        return "hello thinkme";
+    }
 }

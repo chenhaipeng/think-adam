@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 @Target({ElementType.PARAMETER, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface WebLog {
+public @interface SLog {
 
     /**
      * 日志描述
@@ -21,12 +21,14 @@ public @interface WebLog {
 
     /**
      * 是否要登录，默认为true
+     *
      * @return
      */
     boolean needLogin() default true;
 
     /**
      * 是否进行jsr303校验，默认为true
+     *
      * @return
      */
     boolean validate() default true;

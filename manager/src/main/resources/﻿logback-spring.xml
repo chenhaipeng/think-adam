@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <springProperty scope="context" name="logPath" source="log.path"/>
+    <springProperty scope="context" name="logName" source="log.name"/>
+    <appender name="serverAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logPath}/${logName}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logPath}/${logName}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%date{ISO8601}] [%level] %logger{80} %thread [%X{TRACE_ID}] ${logName} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- 典型的日志pattern -->
+        <encoder>
+            <pattern>[%date{ISO8601}] [%level] %logger{80} %thread [%X{TRACE_ID}] ${logName} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- root -->
+    <root level="INFO">
+        <appender-ref ref="serverAppender"/>
+        <appender-ref ref="console"/>
+    </root>
+</configuration>

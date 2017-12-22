@@ -16,17 +16,18 @@ import lombok.Data;
 @AllArgsConstructor
 public class BusinessException extends RuntimeException {
 
-	private Response response;
+    private Response response;
 
-	public BusinessException(String errorMessage) {
-		super(errorMessage);
-	}
+    public BusinessException(String errorMessage) {
+        super(errorMessage);
+    }
 
-	public BusinessException(String errorMessage, Throwable cause) {
-		super(errorMessage, cause);
-	}
-	public BusinessException(Throwable cause) {
-		super(cause);
-	}
+    public BusinessException(String errorMessage, Throwable cause) {
+        super(errorMessage, cause);
+    }
+
+    public BusinessException(Throwable cause) {
+        super(cause);
+    }
 
 }

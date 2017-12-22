@@ -5,11 +5,11 @@ package com.thinkme.base.exception;
  */
 public class InvalidRequestException extends RuntimeException {
 
-    public InvalidRequestException(String errorMessage){
+    public InvalidRequestException(String errorMessage) {
         super(errorMessage);
     }
 
-    public InvalidRequestException(String errorMessage, Throwable cause){
+    public InvalidRequestException(String errorMessage, Throwable cause) {
         super(errorMessage, cause);
     }
 

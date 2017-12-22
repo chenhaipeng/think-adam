@@ -10,18 +10,18 @@ import lombok.Data;
  */
 @Data
 public class PageRequest extends Request {
-	/**
-	 * 分页每页大小
-	 */
-	private int pageSize;
+    /**
+     * 分页每页大小
+     */
+    private int pageSize;
 
-	/**
-	 * 分页起始页， 从1开始计数
-	 */
-	private int pageNum;
+    /**
+     * 分页起始页， 从1开始计数
+     */
+    private int pageNum;
 
-	/**
-	 * 总条数
-	 */
-	private long total = 0L;
+    /**
+     * 总条数
+     */
+    private long total = 0L;
 }

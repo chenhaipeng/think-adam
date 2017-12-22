@@ -31,7 +31,7 @@ public class CaptchaController {
 	@Autowired
 	private DefaultKaptcha captchaProducer;
 
-	@RequestMapping(value = "/captchaImage/{reqNo}",method = RequestMethod.GET)
+	@RequestMapping(value = "/captchaImage/{reqNo}", method = RequestMethod.GET)
 	@ApiOperation("获取图形验证码")
 	public ModelAndView image(@PathVariable("reqNo") String reqNo, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		response.setDateHeader("Expires", 0);

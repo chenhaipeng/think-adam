@@ -27,7 +27,7 @@ public class Response<T> {
     @JsonIgnore
     private Object extData;
 
-    public Response of(CodeInterface codeInterface){
+    public Response of(CodeInterface codeInterface) {
         return Response.builder().code(codeInterface.getCode()).msg(codeInterface.getMsg()).build();
     }
 

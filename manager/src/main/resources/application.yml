@@ -30,3 +30,4 @@ druid:
   sessionStatEnable: true
   sessionStatMaxCount: 2000
   profileEnable: true
+#mybatis

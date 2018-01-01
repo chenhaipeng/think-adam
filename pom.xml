@@ -118,8 +118,6 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-            <!--如果是jar运行，注释掉provided-->
-            <!--<scope>provided</scope>-->
         </dependency>
 
         <dependency>

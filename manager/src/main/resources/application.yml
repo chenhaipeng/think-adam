@@ -22,6 +22,10 @@ spring:
     testWhileIdle: true
     timeBetweenEvictionRunsMillis: 3000
     validationQuery: SELECT 'x'
+  mvc:
+    view:
+      suffix: .jsp
+      prefix: /WEB-INF/view/
 druid:
   filters: stat,wall,slf4j
   loginUsername: admin

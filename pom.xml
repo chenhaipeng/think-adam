@@ -15,6 +15,7 @@
     <version>1.0</version>
     <packaging>pom</packaging>
     <name>think-parent</name>
+    <description>需要tomcat8的支持</description>
 
     <modules>
         <module>adam-framework</module>
@@ -112,6 +113,31 @@
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-spring</artifactId>
         </dependency>
+
+        <!-- spring boot 内置tomcat jsp支持 begin-->
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <!--如果是jar运行，注释掉provided-->
+            <!--<scope>provided</scope>-->
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <!--<scope>provided</scope>-->
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
+        <!-- spring boot 内置tomcat jsp支持 end-->
 
 
     </dependencies>

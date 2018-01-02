@@ -34,4 +34,17 @@ druid:
   sessionStatEnable: true
   sessionStatMaxCount: 2000
   profileEnable: true
-#mybatis
+
+shiro:
+  loginUrl: /login
+  unauthorizedUrl: /unauthorized
+  filterChainDefinitionMap:
+    /static/**: anon
+    /logout: logout
+    /login: authc
+    /**: sysUser,onlineSession,user,syncOnlineSession,perms,roles
+  session:
+    globalSessionTimeout: 1800000 #30分钟
+
+
+

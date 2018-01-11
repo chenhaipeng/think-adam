@@ -1,0 +1,48 @@
+#默认的profile为prod，其他环境通过指定启动参数使用不同的profile，比如：
+#测试环境：java -jar my-spring-boot.jar --spring.profiles.active=test
+#生产环境：java -jar my-spring-boot.jar --spring.profiles.active=prod
+# 连接池配置
+spring:
+  aop:
+    auto: true
+    proxy-target-class: true
+  messages:
+    basename: i18n/messages,i18n/ValidationMessages
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/es?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf-8&amp;&useSSL=false
+    username: root
+    password: root
+    connectionProperties: druid.stat.mergeSql=true;logSlowSql=true;druid.stat.slowSqlMillis=5000
+    filters: stat,slf4j
+    initialSize: 5
+    maxActive: 100
+    maxPoolPreparedStatementPerConnectionSize: 20
+    maxWait: 60000
+    minEvictableIdleTimeMillis: 300000
+    minIdle: 5
+    poolPreparedStatements: true
+    testOnBorrow: false
+    testOnReturn: false
+    testWhileIdle: true
+    timeBetweenEvictionRunsMillis: 3000
+    validationQuery: SELECT 'x'
+  mvc:
+    view:
+      suffix: .jsp
+      prefix: /WEB-INF/jsp/
+  cache:
+    ehcache:
+      config: classpath:ehcache/ehcache.xml
+druid:
+  filters: stat,wall,slf4j
+  loginUsername: admin
+  loginPassword: admin@2017
+  allow: 127.0.0.1
+  sessionStatEnable: true
+  sessionStatMaxCount: 2000
+  profileEnable: true
+
+
+

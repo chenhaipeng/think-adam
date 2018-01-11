@@ -7,6 +7,9 @@ spring:
     active: @activatedProperties@
   aop:
     auto: true
+    proxy-target-class: true
+  messages:
+    basename: i18n/messages,i18n/ValidationMessages
   datasource:
     connectionProperties: druid.stat.mergeSql=true;logSlowSql=true;druid.stat.slowSqlMillis=5000
     filters: stat,slf4j
@@ -25,7 +28,10 @@ spring:
   mvc:
     view:
       suffix: .jsp
-      prefix: /WEB-INF/view/
+      prefix: /WEB-INF/jsp/
+  cache:
+    ehcache:
+      config: classpath:ehcache/ehcache.xml
 druid:
   filters: stat,wall,slf4j
   loginUsername: admin
@@ -37,14 +43,27 @@ druid:
 
 shiro:
   loginUrl: /login
+  logoutUrl: /login?logout=1
   unauthorizedUrl: /unauthorized
+  defaultSuccessUrl: /
+  adminSuccessUrl: /admin/index
+  sessionGlobalSessionTimeout: 1800000 #30分钟
   filterChainDefinitionMap:
     /static/**: anon
     /logout: logout
     /login: authc
-    /**: sysUser,onlineSession,user,syncOnlineSession,perms,roles
-  session:
-    globalSessionTimeout: 1800000 #30分钟
+    /**: user,sysUser
+  cookie:
+    name: uid
+    domain: adam
+    path: /
+    httpOnly: true
+    maxAge: -1
+  rememberMe:
+    name: rememberMe
+    maxAge: 2592000  #默认 rememberMe cookie 60 * 60 * 24 * 30 （30天）
+
+
 
 
 

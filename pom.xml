@@ -20,22 +20,12 @@
     <modules>
         <module>adam-framework</module>
         <!--<module>code-generate</module>-->
+        <module>manager-service</module>
+        <!--<module>adam-shiro</module>-->
         <module>manager</module>
     </modules>
 
     <dependencies>
-
-        <dependency>
-            <groupId>com.thinkme</groupId>
-            <artifactId>core-utils</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.thinkme</groupId>
-            <artifactId>id-generator</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -112,7 +102,26 @@
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-spring</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-beanutils</groupId>
+                    <artifactId>commons-beanutils</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
+
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-quartz</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+
 
         <!-- spring boot 内置tomcat jsp支持 begin-->
         <dependency>
@@ -137,6 +146,30 @@
         </dependency>
         <!-- spring boot 内置tomcat jsp支持 end-->
 
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- TEST begin -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 

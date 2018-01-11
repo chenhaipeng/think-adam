@@ -1,22 +1,27 @@
 package com.thinkme.config;
 
+import com.thinkme.demo.chapter21.credentials.RetryLimitHashedCredentialsMatcher;
+import com.thinkme.demo.chapter21.web.shiro.filter.SysUserFilter;
+import com.thinkme.demo.spring.EhCacheManagerWrapper;
 import com.thinkme.shiro.realm.UserRealm;
-import com.thinkme.shiro.session.mgt.OnlineSessionDAO;
-import com.thinkme.shiro.session.mgt.OnlineSessionFactory;
-import com.thinkme.shiro.session.mgt.OnlineWebSessionManager;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.codec.Base64;
+import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator;
+import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.MethodInvokingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 
-import javax.annotation.PostConstruct;
+import javax.servlet.Filter;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -41,27 +46,64 @@ public class ShiroConfig {
     public static final String rememberMeCookie = "rememberMe";
 
     @Autowired
-    Environment env;
+    private ShiroProperties shiroProperties;
+
+    /**
+     * 在此重点说明这个方法，如果不设置为静态方法会导致bean对象无法注入进来，
+     * http://blog.csdn.net/wuxuyang_7788/article/details/70141812
+     * http://blog.csdn.net/hengyunabc/article/details/75453307
+     */
+    @Bean(name = "lifecycleBeanPostProcessor")
+    public static LifecycleBeanPostProcessor getLifecycleBeanPostProcessor() {
+        return new LifecycleBeanPostProcessor();
+    }
+
+    @Bean(name = "shiroFilter")
+    public ShiroFilterFactoryBean shiroFilter(SecurityManager securityManager, FormAuthenticationFilter formAuthenticationFilter,
+                                              SysUserFilter sysUserFilter) {
+        ShiroFilterFactoryBean shiroFilter = new ShiroFilterFactoryBean();
+        shiroFilter.setSecurityManager(securityManager);
+        shiroFilter.setLoginUrl(shiroProperties.getLoginUrl());
+
+        Map<String, Filter> filters = new HashMap<>();
+        filters.put("authc", formAuthenticationFilter);
+        filters.put("sysUser", sysUserFilter);
+        shiroFilter.setFilters(filters);
+        shiroFilter.setFilterChainDefinitionMap(shiroProperties.getFilterChainDefinitionMap());
+        return shiroFilter;
+
+    }
+
+    @Bean(name = "credentialsMatcher")
+    public RetryLimitHashedCredentialsMatcher credentialsMatcher(EhCacheManagerWrapper cacheManagerWrapper) {
+        RetryLimitHashedCredentialsMatcher credentialsMatcher = new RetryLimitHashedCredentialsMatcher(cacheManagerWrapper);
+        credentialsMatcher.setHashAlgorithmName("md5");
+        credentialsMatcher.setHashIterations(2);
+        credentialsMatcher.setStoredCredentialsHexEncoded(true);
+        return credentialsMatcher;
+    }
 
     @Bean(name = "userRealm")
     public UserRealm userRealm() {
         UserRealm userRealm = new UserRealm();
-//        用切面缓存代理了 此处就不缓存
+//        userRealm.setCredentialsMatcher(retryLimitHashedCredentialsMatcher);
+//        TODO: 2018/1/9  用切面缓存代理了 此处就不缓存
         userRealm.setAuthenticationCachingEnabled(false);
         userRealm.setAuthorizationCachingEnabled(false);
         return userRealm;
     }
-
-    @Bean(name = "sessionFactory")
-    public OnlineSessionFactory sessionFactory() {
-        return new OnlineSessionFactory();
-    }
+//
+//    @Bean(name = "sessionFactory")
+//    public OnlineSessionFactory sessionFactory() {
+//        return new OnlineSessionFactory();
+//    }
 
     @Bean(name = "shiroIdGenerator")
     public JavaUuidSessionIdGenerator idGenerator() {
         return new JavaUuidSessionIdGenerator();
     }
 
+    //    会话Cookie模板
     @Bean(name = "sessionIdCookie")
     public SimpleCookie sessionIdCookie() {
         SimpleCookie simpleCookie = getSimpleCookie(uidCookieName, uidCookieDomain, uidCookiePath,
@@ -74,9 +116,9 @@ public class ShiroConfig {
         return getSimpleCookie(rememberMeCookie, uidCookieDomain, uidCookiePath, uidCookieHttpOnly, uidCookieMaxAge);
     }
 
-    @Bean(name = "onlineSessionDAO")
-    public OnlineSessionDAO onlineSessionDAO() {
-        OnlineSessionDAO sessionDAO = new OnlineSessionDAO();
+    @Bean(name = "sessionDAO")
+    public EnterpriseCacheSessionDAO sessionDAO() {
+        EnterpriseCacheSessionDAO sessionDAO = new EnterpriseCacheSessionDAO();
         sessionDAO.setSessionIdGenerator(idGenerator());
         sessionDAO.setActiveSessionsCacheName(sessionCacheName);
         return sessionDAO;
@@ -92,12 +134,14 @@ public class ShiroConfig {
 
     //会话管理器
     @Bean(name = "sessionManager")
-    public OnlineWebSessionManager sessionManager() {
-        OnlineWebSessionManager sessionManager = new OnlineWebSessionManager();
-        sessionManager.setGlobalSessionTimeout(Long.parseLong(env.getProperty("shiro.session.globalSessionTimeout")));
-        sessionManager.setSessionFactory(sessionFactory());
-        sessionManager.setSessionDAO(onlineSessionDAO());
-        sessionManager.setDeleteInvalidSessions(false);
+    public DefaultWebSessionManager sessionManager() {
+        DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
+        sessionManager.setGlobalSessionTimeout(shiroProperties.getSessionGlobalSessionTimeout());
+        sessionManager.setSessionDAO(sessionDAO());
+        sessionManager.setDeleteInvalidSessions(true);
+        sessionManager.setSessionIdCookieEnabled(true);
+        sessionManager.setSessionIdCookie(sessionIdCookie());
+
 
         //todo 缓存 调度
 
@@ -105,37 +149,51 @@ public class ShiroConfig {
     }
 
     @Bean(name = "securityManager")
-    public DefaultWebSecurityManager securityManager() {
+    public DefaultWebSecurityManager securityManager(com.thinkme.demo.chapter21.realm.UserRealm userRealm,
+                                                     DefaultWebSessionManager sessionManager) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
-        securityManager.setRealm(userRealm());
-        securityManager.setSessionManager(sessionManager());
+        securityManager.setRealm(userRealm);
+        securityManager.setSessionManager(sessionManager);
         securityManager.setRememberMeManager(rememberMeManager());
         return securityManager;
     }
 
-    @Bean(name = "shiroFilter")
-    public ShiroFilterFactoryBean shiroFilter() {
-        ShiroFilterFactoryBean shiroFilter = new ShiroFilterFactoryBean();
-        shiroFilter.setSecurityManager(securityManager());
-        shiroFilter.setLoginUrl(env.getProperty("shiro.loginUrl"));
-        shiroFilter.setUnauthorizedUrl(env.getProperty("shiro.unauthorizedUrl"));
+    @Bean(name = "sysUserFilter")
+    public SysUserFilter sysUserFilter() {
+        return new SysUserFilter();
+    }
 
-        //todo filters
+////    退出登录过滤器
+//    @Bean
+//    public LogoutFilter logoutFilter(){
+//        LogoutFilter logoutFilter = new LogoutFilter();
+//        logoutFilter.setRedirectUrl(env.getProperty("shiro.logoutUrl"));
+//        return logoutFilter;
+//    }
 
-        shiroFilter.setFilterChainDefinitionMap(env.getProperty("shiro.filterChainDefinitionMap", Map.class));
-        return shiroFilter;
-
+    //    替换默认的form 验证过滤器
+    @Bean
+    public FormAuthenticationFilter formAuthenticationFilter() {
+        FormAuthenticationFilter authenticationFilter = new FormAuthenticationFilter();
+//        表单上的用户名/密码 下次自动登录的参数名
+        authenticationFilter.setUsernameParam("username");
+        authenticationFilter.setPasswordParam("password");
+        authenticationFilter.setRememberMeParam("rememberMe");
+        authenticationFilter.setLoginUrl("/login");
+        return authenticationFilter;
     }
 
     /*    aop and other
         For simplest integration, so that all SecurityUtils.* methods work in all cases,
         make the securityManager bean a static singleton.  DO NOT do this in web
         applications - see the 'Web Applications' section below instead.*/
-    @PostConstruct
-    public void setSecurityManager() {
-        SecurityUtils.setSecurityManager(securityManager());
+    @Bean
+    public MethodInvokingBean methodInvokingBean(SecurityManager securityManager) {
+        MethodInvokingBean mBean = new MethodInvokingBean();
+        mBean.setStaticMethod("org.apache.shiro.SecurityUtils.setSecurityManager");
+        mBean.setArguments(securityManager);
+        return mBean;
     }
-
 
     private SimpleCookie getSimpleCookie(String rememberMeCookie, String uidCookieDomain, String uidCookiePath,
                                          boolean uidCookieHttpOnly, int uidCookieMaxAge) {

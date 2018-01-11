@@ -19,7 +19,16 @@
 
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.thinkme</groupId>
+            <artifactId>manager-service</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
+
     <build>
+
         <resources>
             <!-- 打包时将jsp文件拷贝到META-INF目录下 -->
             <resource>

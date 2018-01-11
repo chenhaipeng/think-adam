@@ -27,7 +27,7 @@ public class Swagger2 {
                 .apiInfo(apiInfo())
 //                .globalOperationParameters(aParameters)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.thinkme.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.thinkme.test.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }

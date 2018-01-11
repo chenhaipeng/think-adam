@@ -4,14 +4,15 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
 import com.thinkme.base.nutz.SpringDaoRunner;
+import com.thinkme.demo.spring.SpringUtils;
 import org.nutz.dao.Dao;
 import org.nutz.dao.impl.DaoRunner;
 import org.nutz.dao.impl.NutDao;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -24,9 +25,6 @@ import java.util.Properties;
  */
 @Configuration
 public class SpringBeanConfig {
-
-    @Autowired
-    Environment env;
 
     @Bean(name = "captchaProducer")
     public DefaultKaptcha getKaptchaBean() {
@@ -47,25 +45,9 @@ public class SpringBeanConfig {
     }
 
     @Bean(name = "dataSource")
-    @Qualifier("dataSource")
+    @ConfigurationProperties(prefix = "spring.datasource")
     public DataSource dataSource() {
-        DruidDataSource datasource = new DruidDataSource();
-        datasource.setUrl(env.getProperty("spring.datasource.url"));
-        datasource.setUsername(env.getProperty("spring.datasource.username"));
-        datasource.setPassword(env.getProperty("spring.datasource.password"));
-        datasource.setDriverClassName(env.getProperty("spring.datasource.driver-class-name"));
-        datasource.setInitialSize(Integer.parseInt(env.getProperty("spring.datasource.initialSize")));
-        datasource.setMinIdle(Integer.parseInt(env.getProperty("spring.datasource.minIdle")));
-        datasource.setMaxActive(Integer.parseInt(env.getProperty("spring.datasource.maxActive")));
-        datasource.setMaxWait(Integer.parseInt(env.getProperty("spring.datasource.maxWait")));
-        datasource.setTimeBetweenEvictionRunsMillis(Integer.parseInt(env.getProperty("spring.datasource.timeBetweenEvictionRunsMillis")));
-        datasource.setMinEvictableIdleTimeMillis(Integer.parseInt(env.getProperty("spring.datasource.minEvictableIdleTimeMillis")));
-        datasource.setValidationQuery(env.getProperty("spring.datasource.validationQuery"));
-        datasource.setTestWhileIdle(Boolean.parseBoolean(env.getProperty("spring.datasource.testWhileIdle")));
-        datasource.setTestOnBorrow(Boolean.parseBoolean(env.getProperty("spring.datasource.testOnBorrow")));
-        datasource.setTestOnReturn(Boolean.parseBoolean(env.getProperty("spring.datasource.testOnReturn")));
-
-        return datasource;
+        return new DruidDataSource();
     }
 
     @Bean(name = "springDaoRunner")
@@ -79,6 +61,29 @@ public class SpringBeanConfig {
         dao.setRunner(runner());
         dao.setDataSource(dataSource());
         return dao;
+    }
+
+    @Bean
+    public SpringUtils springUtils() {
+        return new SpringUtils();
+    }
+
+
+    @Bean
+    public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+        return new JdbcTemplate(dataSource);
+    }
+
+    //    国际化的消息资源文件（本系统中主要用于显示/错误消息定制）
+    @Bean
+    public ReloadableResourceBundleMessageSource messageSource() {
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasenames("classpath:messages", "classpath:ValidationMessages");
+        messageSource.setUseCodeAsDefaultMessage(false);
+        messageSource.setDefaultEncoding("UTF-8");
+        messageSource.setCacheSeconds(60);
+        return messageSource;
+
     }
 
 }

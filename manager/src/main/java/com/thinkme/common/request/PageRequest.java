@@ -1,6 +1,7 @@
 package com.thinkme.common.request;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author chenhaipeng
@@ -9,6 +10,7 @@ import lombok.Data;
  * @date 2017/11/28 上午11:51
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class PageRequest extends Request {
     /**
      * 分页每页大小

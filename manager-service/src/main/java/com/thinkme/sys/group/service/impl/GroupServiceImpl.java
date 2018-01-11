@@ -53,6 +53,7 @@ public class GroupServiceImpl extends BaseServiceImpl<Group> implements GroupSer
     public Set<Long> findShowGroupIds(Long userId, Set<Long> organizationIds) {
         Set<Long> groupIds = Sets.newHashSet();
         groupIds.addAll(findDefaultGroupIds());
+//        groupIds.addAll()
 
 
         return null;

@@ -2,6 +2,8 @@
 #测试环境：java -jar my-spring-boot.jar --spring.profiles.active=test
 #生产环境：java -jar my-spring-boot.jar --spring.profiles.active=prod
 # 连接池配置
+server:
+  port: 8089
 spring:
   aop:
     auto: true

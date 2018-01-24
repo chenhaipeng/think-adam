@@ -32,7 +32,7 @@ public class GroupServiceImpl extends BaseServiceImpl<Group> implements GroupSer
      */
     @Override
     public Set<Long> findDefaultGroupIds() {
-        List<Group> list = query("id", Cnd.where("default_group", "=", 1));
+        List<Group> list = query("id", Cnd.where("default_group", "=", 1).and("is_show","=",1));
         return Sets.newHashSet(Collections2.transform(list, new Function<Group, Long>() {
             @Nullable
             @Override
@@ -41,6 +41,7 @@ public class GroupServiceImpl extends BaseServiceImpl<Group> implements GroupSer
             }
         }));
     }
+
 
     /**
      * 获取可用的分组编号列表
@@ -53,9 +54,8 @@ public class GroupServiceImpl extends BaseServiceImpl<Group> implements GroupSer
     public Set<Long> findShowGroupIds(Long userId, Set<Long> organizationIds) {
         Set<Long> groupIds = Sets.newHashSet();
         groupIds.addAll(findDefaultGroupIds());
-//        groupIds.addAll()
+        // TODO: 2018/1/24 不明白sys_group_relation 是否有start_user_id？
 
-
-        return null;
+        return groupIds;
     }
 }

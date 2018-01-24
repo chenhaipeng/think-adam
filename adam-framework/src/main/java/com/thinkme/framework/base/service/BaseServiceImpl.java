@@ -6,6 +6,7 @@ import com.thinkme.framework.page.datatable.DataTableColumn;
 import com.thinkme.framework.page.datatable.DataTableOrder;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.nutz.dao.*;
+import org.nutz.dao.entity.Entity;
 import org.nutz.dao.entity.Record;
 import org.nutz.dao.pager.Pager;
 import org.nutz.dao.sql.Sql;
@@ -659,6 +660,25 @@ public class BaseServiceImpl<T> extends EntityService<T> implements BaseService<
     public List<T> query(Condition cnd, Pager pager) {
         return dao().query(getEntityClass(), cnd, pager);
     }
+
+
+    /**
+     *
+     * @param sql sql对象
+     * @return
+     */
+    @Override
+    public List<T> query(Sql sql) {
+        if (sql == null) return null;
+        //返回一组对象
+        sql.setCallback(Sqls.callback.entities());
+        Entity<T> entity = dao.getEntity(this.getEntityClass());
+
+        sql.setEntity(entity);
+        dao.execute(sql);
+        return sql.getList(this.getEntityClass());
+    }
+
 
     /**
      * 计算子节点ID

@@ -2,7 +2,7 @@ package com.thinkme.shiro.realm;
 
 import com.thinkme.sys.user.entity.User;
 import com.thinkme.sys.user.exception.*;
-import com.thinkme.sys.user.service.UserAuthService;
+import com.thinkme.sys.user.service.impl.UserAuthServiceImpl;
 import com.thinkme.sys.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.*;
@@ -25,7 +25,7 @@ public class UserRealm extends AuthorizingRealm {
     private UserService userService;
 
     @Autowired
-    private UserAuthService userAuthService;
+    private UserAuthServiceImpl userAuthServiceImpl;
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
@@ -33,8 +33,8 @@ public class UserRealm extends AuthorizingRealm {
         User user = userService.findByUsername(username);
 
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
-        authorizationInfo.setRoles(userAuthService.findStringRoles(user));
-        authorizationInfo.setStringPermissions(userAuthService.findStringPermissions(user));
+        authorizationInfo.setRoles(userAuthServiceImpl.findStringRoles(user));
+        authorizationInfo.setStringPermissions(userAuthServiceImpl.findStringPermissions(user));
 
         return authorizationInfo;
     }

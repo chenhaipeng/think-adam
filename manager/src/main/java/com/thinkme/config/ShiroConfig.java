@@ -1,8 +1,7 @@
 package com.thinkme.config;
 
-import com.thinkme.demo.chapter21.credentials.RetryLimitHashedCredentialsMatcher;
-import com.thinkme.demo.chapter21.web.shiro.filter.SysUserFilter;
-import com.thinkme.demo.spring.EhCacheManagerWrapper;
+import com.thinkme.shiro.filter.authc.CustomFormAuthenticationFilter;
+import com.thinkme.shiro.filter.user.SysUserFilter;
 import com.thinkme.shiro.realm.UserRealm;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.mgt.SecurityManager;
@@ -74,14 +73,14 @@ public class ShiroConfig {
 
     }
 
-    @Bean(name = "credentialsMatcher")
-    public RetryLimitHashedCredentialsMatcher credentialsMatcher(EhCacheManagerWrapper cacheManagerWrapper) {
-        RetryLimitHashedCredentialsMatcher credentialsMatcher = new RetryLimitHashedCredentialsMatcher(cacheManagerWrapper);
-        credentialsMatcher.setHashAlgorithmName("md5");
-        credentialsMatcher.setHashIterations(2);
-        credentialsMatcher.setStoredCredentialsHexEncoded(true);
-        return credentialsMatcher;
-    }
+//    @Bean(name = "credentialsMatcher")
+//    public RetryLimitHashedCredentialsMatcher credentialsMatcher(EhCacheManagerWrapper cacheManagerWrapper) {
+//        RetryLimitHashedCredentialsMatcher credentialsMatcher = new RetryLimitHashedCredentialsMatcher(cacheManagerWrapper);
+//        credentialsMatcher.setHashAlgorithmName("md5");
+//        credentialsMatcher.setHashIterations(2);
+//        credentialsMatcher.setStoredCredentialsHexEncoded(true);
+//        return credentialsMatcher;
+//    }
 
     @Bean(name = "userRealm")
     public UserRealm userRealm() {
@@ -149,7 +148,7 @@ public class ShiroConfig {
     }
 
     @Bean(name = "securityManager")
-    public DefaultWebSecurityManager securityManager(com.thinkme.demo.chapter21.realm.UserRealm userRealm,
+    public DefaultWebSecurityManager securityManager(UserRealm userRealm,
                                                      DefaultWebSessionManager sessionManager) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(userRealm);
@@ -173,13 +172,14 @@ public class ShiroConfig {
 
     //    替换默认的form 验证过滤器
     @Bean
-    public FormAuthenticationFilter formAuthenticationFilter() {
-        FormAuthenticationFilter authenticationFilter = new FormAuthenticationFilter();
+    public CustomFormAuthenticationFilter formAuthenticationFilter() {
+        CustomFormAuthenticationFilter authenticationFilter = new CustomFormAuthenticationFilter();
+        authenticationFilter.setDefaultSuccessUrl(shiroProperties.getDefaultSuccessUrl());
+        authenticationFilter.setAdminDefaultSuccessUrl(shiroProperties.getAdminSuccessUrl());
 //        表单上的用户名/密码 下次自动登录的参数名
         authenticationFilter.setUsernameParam("username");
         authenticationFilter.setPasswordParam("password");
         authenticationFilter.setRememberMeParam("rememberMe");
-        authenticationFilter.setLoginUrl("/login");
         return authenticationFilter;
     }
 

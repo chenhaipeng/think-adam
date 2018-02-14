@@ -4,7 +4,7 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
 import com.thinkme.base.nutz.SpringDaoRunner;
-import com.thinkme.demo.spring.SpringUtils;
+import com.thinkme.framework.utils.SpringUtils;
 import org.nutz.dao.Dao;
 import org.nutz.dao.impl.DaoRunner;
 import org.nutz.dao.impl.NutDao;
@@ -78,7 +78,7 @@ public class SpringBeanConfig {
     @Bean
     public ReloadableResourceBundleMessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasenames("classpath:messages", "classpath:ValidationMessages");
+        messageSource.setBasenames("classpath:i18n/messages", "classpath:i18n/ValidationMessages");
         messageSource.setUseCodeAsDefaultMessage(false);
         messageSource.setDefaultEncoding("UTF-8");
         messageSource.setCacheSeconds(60);

@@ -1,6 +1,7 @@
 package com.thinkme.sys.user.service.impl;
 
 import com.thinkme.framework.base.service.BaseServiceImpl;
+import com.thinkme.framework.utils.SpringUtils;
 import com.thinkme.sys.user.entity.User;
 import com.thinkme.sys.user.entity.UserStatus;
 import com.thinkme.sys.user.exception.UserBlockedException;
@@ -12,7 +13,6 @@ import com.thinkme.sys.user.service.UserStatusHistoryService;
 import com.thinkme.sys.user.utils.UserLogUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.nutz.dao.Cnd;
-import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +53,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
     @Transactional
     public User login(String username, String password) {
 
-        if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
+         if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
             UserLogUtils.log(
                     username,
                     "loginError",
@@ -73,7 +73,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         User user = null;
 
         //此处需要走代理对象，目的是能走缓存切面
-        UserService proxyUserService = (UserService) AopContext.currentProxy();
+        UserService proxyUserService = SpringUtils.getBean("sysUserService");
         if (maybeUsername(username)) {
             user = proxyUserService.findByUsername(username);
         }

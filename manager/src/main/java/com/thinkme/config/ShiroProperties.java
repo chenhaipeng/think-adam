@@ -37,7 +37,7 @@ public class ShiroProperties {
     private RememberMe rememberMe;
 
     @Data
-    class Cookie {
+    public static class Cookie {
         private String name;
         private String domain;
         private String path;
@@ -47,7 +47,7 @@ public class ShiroProperties {
     }
 
     @Data
-    class RememberMe {
+    public static class RememberMe {
         private String name;
         private String maxAge;
 

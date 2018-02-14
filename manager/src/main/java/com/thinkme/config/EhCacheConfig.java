@@ -1,6 +1,6 @@
 package com.thinkme.config;
 
-import com.thinkme.demo.spring.EhCacheManagerWrapper;
+import com.thinkme.base.cache.EhCacheManagerWrapper;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;

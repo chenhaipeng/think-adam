@@ -1,30 +1,36 @@
 package com.thinkme.sys.user.service.impl;
 
 import com.google.common.base.Function;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 import com.thinkme.framework.base.service.BaseServiceImpl;
 import com.thinkme.sys.group.service.GroupService;
 import com.thinkme.sys.organization.service.JobService;
 import com.thinkme.sys.organization.service.OrganizationService;
-import com.thinkme.sys.permisstion.entity.Role;
+import com.thinkme.sys.permission.entity.Permission;
+import com.thinkme.sys.permission.entity.Role;
+import com.thinkme.sys.permission.entity.RoleResourcePermission;
+import com.thinkme.sys.permission.service.RoleResourcePermissionService;
+import com.thinkme.sys.permission.service.RoleService;
+import com.thinkme.sys.resource.service.ResourceService;
 import com.thinkme.sys.user.entity.Auth;
 import com.thinkme.sys.user.entity.User;
 import com.thinkme.sys.user.entity.UserOrganizationJob;
 import com.thinkme.sys.user.service.UserAuthService;
 import com.thinkme.sys.user.service.UserOrganizationJobService;
+import com.thinkme.utils.json.FastJsonUtil;
 import com.thinkme.utils.text.MoreStringUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.nutz.dao.Sqls;
 import org.nutz.dao.sql.Sql;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import javax.annotation.Resource;
+import java.util.*;
 
 /**
  * @author chenhaipeng
@@ -48,8 +54,18 @@ public class UserAuthServiceImpl extends BaseServiceImpl<Auth> implements UserAu
     @Autowired
     GroupService groupService;
 
+    @Resource(name = "sysRoleService")
+    RoleService roleService;
+
+    @Autowired
+    RoleResourcePermissionService roleResourcePermissionService;
+
+    @Resource(name = "sysResourceService")
+    ResourceService resourceService;
+
 
     // TODO: 2018/1/11 这个类需要优化
+    @Override
     public Set<Role> findRoles(User user) {
 
         if (user == null) {
@@ -88,28 +104,68 @@ public class UserAuthServiceImpl extends BaseServiceImpl<Auth> implements UserAu
         //默认分组 + 根据用户编号 和 组织编号 找 分组
         Set<Long> groupIds = groupService.findShowGroupIds(userId, organizationIds);
 
-        this.findRoleIds(userId, groupIds, organizationIds, jobIds, organizationJobIds);
+        Set<Long> roleIds = findRoleIds(userId, groupIds, organizationIds, jobIds, organizationJobIds);
 
+        Set<Role> roles = roleService.findShowRoles(roleIds);
 
-        return null;
+        return roles;
     }
 
 
+    @Override
     public Set<String> findStringRoles(User user) {
         Set<Role> roles = findRoles(user);
 
-        return Sets.newHashSet(Collections2.transform(roles, new Function<Role, String>() {
+        Set<String> set =  Sets.newHashSet(Collections2.transform(roles, new Function<Role, String>() {
             @Nullable
             @Override
             public String apply(@Nullable Role role) {
                 return role.getRole();
             }
         }));
+        log.info("用户:{},拥有roles:{}",user.getUsername(), FastJsonUtil.object2String(set));
+        return set;
     }
 
 
+    // TODO: 2018/1/25 这些应该用关系查询而不是一个一个单独查
+    @Override
     public Set<String> findStringPermissions(User user) {
-        return null;
+        Set<String> permissions = Sets.newHashSet();
+        Set<Role> roles = findRoles(user);
+        for (Role role : roles) {
+            List<RoleResourcePermission> roleResourcePermissions = roleResourcePermissionService.findByRoleId(role.getId());
+
+            for (RoleResourcePermission rrp : roleResourcePermissions) {
+
+                com.thinkme.sys.resource.entity.Resource resource = resourceService.fetch(rrp.getResourceId());
+                String actualResourceIdentity = resourceService.findActualResourceIdentity(resource);
+
+                //不可用 即没查到 或者标识字符串不存在
+                if (resource == null || StringUtils.isEmpty(actualResourceIdentity) || Boolean.FALSE.equals(resource.getIsShow())) {
+                    continue;
+                }
+
+                String permissionIds = rrp.getPermissionIds();
+                Iterable<String> iterable = Splitter.on(",").omitEmptyStrings().split(permissionIds);
+                for (Iterator<String> iterator = iterable.iterator(); iterator.hasNext(); ) {
+                    String permissionId = iterator.next();
+
+                    Permission permission = dao.fetch(Permission.class, Long.valueOf(permissionId));
+
+                    //不可用
+                    if (permission == null || Boolean.FALSE.equals(permission.getIsShow())) {
+                        continue;
+                    }
+                    permissions.add(actualResourceIdentity + ":" + permission.getPermission());
+
+                }
+
+            }
+
+        }
+        log.info("用户:{},拥有permissions:{}",user.getUsername(), FastJsonUtil.object2String(permissions));
+        return permissions;
     }
 
 
@@ -179,10 +235,12 @@ public class UserAuthServiceImpl extends BaseServiceImpl<Auth> implements UserAu
 
         List<Auth> list = query(sql);
 
-        Set<Long> roleIds = Sets.newHashSet();
+        Set<Long> roleIds = new HashSet<>();
         for (Auth auth : list) {
-            List authList = Arrays.asList(auth.getRoleIds().split(","));
-            roleIds.addAll(authList);
+             String[] arr = auth.getRoleIds().split(",");
+            for (int j = 0; j< arr.length ; j++){
+                roleIds.add(Long.valueOf(arr[j]));
+            }
         }
 
         return roleIds;

@@ -1,6 +1,6 @@
 package com.thinkme.config;
 
-import com.thinkme.demo.chapter21.web.bind.method.CurrentUserMethodArgumentResolver;
+import com.thinkme.base.bind.method.CurrentUserMethodArgumentResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;

@@ -52,10 +52,10 @@ public class User implements Serializable {
     private UserStatus status;
 
     @Column("deleted")
-    private int deleted;
+    private Boolean deleted;
 
     @Column("admin")
-    private int admin;
+    private Boolean admin;
 
 
 }

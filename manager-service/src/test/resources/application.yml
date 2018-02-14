@@ -45,6 +45,27 @@ druid:
   sessionStatEnable: true
   sessionStatMaxCount: 2000
   profileEnable: true
+shiro:
+  loginUrl: /login
+  logoutUrl: /login?logout=1
+  unauthorizedUrl: /unauthorized
+  defaultSuccessUrl: /
+  adminSuccessUrl: /admin/index
+  sessionGlobalSessionTimeout: 1800000 #30分钟
+  filterChainDefinitionMap:
+    /static/**: anon
+    /logout: logout
+    /login: authc
+    /**: user,sysUser
+#  cookie:
+#    name: uid
+#    domain: adam
+#    path: /
+#    httpOnly: true
+#    maxAge: -1
+#  rememberMe:
+#    name: rememberMe
+#    maxAge: 2592000  #默认 rememberMe cookie 60 * 60 * 24 * 30 （30天）
 
 
 

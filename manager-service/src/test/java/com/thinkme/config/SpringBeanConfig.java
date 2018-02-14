@@ -4,6 +4,7 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
 import com.thinkme.base.nutz.SpringDaoRunner;
+import com.thinkme.framework.utils.SpringUtils;
 import org.nutz.dao.Dao;
 import org.nutz.dao.impl.DaoRunner;
 import org.nutz.dao.impl.NutDao;
@@ -66,11 +67,18 @@ public class SpringBeanConfig {
         return dao;
     }
 
+    @Bean
+    public SpringUtils springUtils() {
+        return new SpringUtils();
+    }
+
 
     @Bean
     public JdbcTemplate jdbcTemplate(DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }
+
+
 
 
 }
